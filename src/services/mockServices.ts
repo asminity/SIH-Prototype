@@ -1,6 +1,6 @@
 import { mockData } from '../data/mockData'
 import { prototypeStore } from '../state/prototypeStore'
-import type { AlertDetailRecord, AlertId, AlertStatus, Case, ClusterId, CorrelationIntelligenceRecord, DashboardFilters, DashboardSnapshot, EntityId, GraphNodeDetails, InvestigationId, TransactionId, TransactionIntelligenceRecord, ValidationCategory, WalletId } from '../types/domain'
+import type { AlertDetailRecord, AlertId, AlertStatus, Case, CaseId, CaseStatus, ClusterId, CorrelationIntelligenceRecord, DashboardFilters, DashboardSnapshot, EntityId, GraphNodeDetails, InvestigationId, TransactionId, TransactionIntelligenceRecord, ValidationCategory, WalletId } from '../types/domain'
 
 const copy = <T>(value: T): T => structuredClone(value)
 
@@ -284,6 +284,7 @@ export function getTimelineEvents(investigationId?: InvestigationId) {
 
 export function getCases() { return copy(prototypeStore.getState().cases) }
 export function getCaseById(id: string) { return copy(prototypeStore.getCase(id as Case['id'])) }
+export function updateCaseStatus(id: string, status: CaseStatus) { return copy(prototypeStore.updateCaseStatus(id as CaseId, status)) }
 export function createCaseFromAlert(alertId: AlertId) {
   const alert = prototypeStore.getAlert(alertId)
   if (!alert) return undefined

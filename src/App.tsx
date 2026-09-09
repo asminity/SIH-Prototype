@@ -4,10 +4,9 @@ import { routes } from './data/navigation'
 import { DashboardPage } from './pages/DashboardPage'
 import { DataIngestionPage } from './pages/DataIngestionPage'
 import { AlertsPage } from './pages/AlertsPage'
-import { CorrelationPage } from './pages/CorrelationPage'
 import { EntityExplorerPage } from './pages/EntityExplorerPage'
 import { EntityGraphPage } from './pages/EntityGraphPage'
-import { ThreatFusionPage } from './pages/ThreatFusionPage'
+import { FusionAnalysisPage } from './pages/FusionAnalysisPage'
 import { InvestigationPage } from './pages/InvestigationPage'
 import { ModulePage } from './pages/ModulePage'
 import { TransactionExplorerPage } from './pages/TransactionExplorerPage'
@@ -24,8 +23,10 @@ export default function App() {
           <Route path="/investigations" element={<Navigate to="/cases" replace />} />
           <Route path="/system-status" element={<Navigate to="/" replace />} />
           <Route path="/settings" element={<Navigate to="/" replace />} />
-          <Route path="/model-analysis" element={<Navigate to="/threat-fusion" replace />} />
-          <Route path="/feature-fusion" element={<Navigate to="/threat-fusion" replace />} />
+          <Route path="/model-analysis" element={<Navigate to="/fusion-analysis" replace />} />
+          <Route path="/feature-fusion" element={<Navigate to="/fusion-analysis" replace />} />
+          <Route path="/threat-fusion" element={<Navigate to="/fusion-analysis" replace />} />
+          <Route path="/relationship-analysis" element={<Navigate to="/entity-graph" replace />} />
           {routes.map((route) => {
             let element = <ModulePage />
             if (route.path === '/') element = <DashboardPage />
@@ -34,8 +35,7 @@ export default function App() {
             else if (route.path === '/network-activity') element = <NetworkActivityPage />
             else if (route.path === '/entity-explorer') element = <EntityExplorerPage />
             else if (route.path === '/entity-graph') element = <EntityGraphPage />
-            else if (route.path === '/relationship-analysis') element = <CorrelationPage />
-            else if (route.path === '/threat-fusion') element = <ThreatFusionPage />
+            else if (route.path === '/fusion-analysis') element = <FusionAnalysisPage />
             else if (route.path === '/ai-alerts') element = <AlertsPage />
             else if (route.path === '/investigations') element = <InvestigationPage />
             else if (route.path === '/cases') element = <CasesPage />

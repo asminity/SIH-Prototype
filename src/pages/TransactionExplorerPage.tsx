@@ -183,7 +183,6 @@ export function TransactionExplorerPage() {
       <PageHeader
         eyebrow="DATA INTELLIGENCE / BLOCKCHAIN TELEMETRY"
         title="Transaction Explorer"
-        description="Real-time UTXO flow surveillance, heuristic clustering verification, and anomaly inspection."
         actions={
           <div className="flex-actions">
             <button

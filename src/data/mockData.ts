@@ -1678,8 +1678,8 @@ export const featureFusion: FeatureFusionResult = {
 export const riskAssessments: RiskAssessment[] = [{
   clusterId, score: 91, confidence: 0.94, severity: 'HIGH',
   breakdown: [
-    { label: 'Anomaly Signal', points: 22, evidence: 'Consistent suspicious outputs across both independent model branches.', evidencePath: '/threat-fusion' },
-    { label: 'Correlation Evidence', points: 19, evidence: 'Strong observed network-blockchain correlation with repeated IP association.', evidencePath: '/relationship-analysis?correlation=corr_cluster42_01' },
+    { label: 'Anomaly Signal', points: 22, evidence: 'Consistent suspicious outputs across both independent model branches.', evidencePath: '/fusion-analysis' },
+    { label: 'Correlation Evidence', points: 19, evidence: 'Strong observed network-blockchain correlation with repeated IP association.', evidencePath: '/network-activity?ip=ip_185_220_101_14' },
     { label: 'Graph Behavior', points: 18, evidence: 'High graph connectivity across the primary entity, wallets, and Cluster #42.', evidencePath: '/entity-graph?cluster=cluster_42' },
     { label: 'Pattern Detection', points: 17, evidence: 'Potential peeling-chain pattern and elevated transaction velocity require analyst review.', evidencePath: '/transactions?tx=tx_4f8c91aef5a2c9d8e7b61403a1c6d9e2b5f80734c1a9e6d3b8f20517d4e991ae' },
     { label: 'Network Behavior', points: 15, evidence: 'Repeated network observations and temporal relationships across six IP addresses.', evidencePath: '/network-activity?ip=ip_185_220_101_14' },
@@ -1702,6 +1702,9 @@ export const alerts: Alert[] = [
   { id: 'alert_0031', entityId: 'entity_017', clusterId: 'cluster_17', investigationId: 'investigation_2026_0017', riskScore: 28, confidence: 0.87, severity: 'LOW', status: 'CONFIRMED', title: 'Routine exchange activity observed', description: 'Normal activity profile with expected transaction cadence.', transactionIds: transactions.slice(27).map((transaction) => transaction.id), generatedAt: '2026-09-04T11:20:00.000Z' },
   { id: 'alert_0038', entityId: primaryEntityId, clusterId, investigationId, riskScore: 67, confidence: 0.82, severity: 'MEDIUM', status: 'REVIEWING', title: 'Repeated counterparty association', description: 'A recurring network-wallet relationship was detected during the observation window.', transactionIds: transactions.slice(6, 10).map((transaction) => transaction.id), generatedAt: '2026-09-05T09:42:00.000Z' },
   { id: 'alert_0041', entityId: primaryEntityId, clusterId, investigationId, riskScore: 79, confidence: 0.88, severity: 'HIGH', status: 'NEW', title: 'Multi-hop movement signal', description: 'Potential peeling-chain behavior observed across linked wallets.', transactionIds: transactions.slice(18, 23).map((transaction) => transaction.id), generatedAt: '2026-09-05T09:51:00.000Z' },
+  { id: 'alert_0045', entityId: primaryEntityId, clusterId, investigationId, riskScore: 84, confidence: 0.91, severity: 'HIGH', status: 'NEW', title: 'Tor exit relay convergence on high-value UTXO', description: 'Co-occurring Tor relay telemetry detected during rapid fund consolidation across intermediate addresses.', transactionIds: transactions.slice(10, 14).map((transaction) => transaction.id), generatedAt: '2026-09-05T10:15:00.000Z' },
+  { id: 'alert_0049', entityId: primaryEntityId, clusterId, investigationId, riskScore: 73, confidence: 0.86, severity: 'HIGH', status: 'NEW', title: 'Peeling-chain fragmentation & unhosted wallet transfer', description: 'Automated peeling structure identified with fractional change returns mimicking obfuscation heuristics.', transactionIds: transactions.slice(14, 18).map((transaction) => transaction.id), generatedAt: '2026-09-05T10:28:00.000Z' },
+  { id: 'alert_0052', entityId: primaryEntityId, clusterId, investigationId, riskScore: 62, confidence: 0.79, severity: 'MEDIUM', status: 'NEW', title: 'Anomalous velocity burst across counterparty network', description: 'Transaction frequency accelerated beyond 3x baseline moving into suspect address cluster.', transactionIds: transactions.slice(20, 24).map((transaction) => transaction.id), generatedAt: '2026-09-05T10:44:00.000Z' },
 ]
 
 export const timelineEvents: TimelineEvent[] = [
@@ -1734,6 +1737,39 @@ export const cases: Case[] = [
     createdAt: '2026-09-05T10:06:00.000Z',
     assignedTo: 'Analyst R-04',
     evidenceIds: [primaryAlertId, investigationId, clusterId, ...timelineEvents.map((event) => event.id)],
+  },
+  {
+    id: 'case_2026_0095',
+    investigationId,
+    sourceAlertId: 'alert_0045',
+    title: 'Tor Relay Exit Node Convergence & Rapid UTXO Consolidation',
+    status: 'OPEN',
+    priority: 'URGENT',
+    createdAt: '2026-09-05T10:20:00.000Z',
+    assignedTo: 'Analyst R-04',
+    evidenceIds: ['alert_0045', investigationId, clusterId, 'ip_185_220_101_42', 'asn_60729'],
+  },
+  {
+    id: 'case_2026_0104',
+    investigationId,
+    sourceAlertId: 'alert_0049',
+    title: 'Peeling-Chain Address Fragmentation & Unhosted Dispersion',
+    status: 'OPEN',
+    priority: 'URGENT',
+    createdAt: '2026-09-05T10:35:00.000Z',
+    assignedTo: 'Analyst R-04',
+    evidenceIds: ['alert_0049', investigationId, clusterId],
+  },
+  {
+    id: 'case_2026_0112',
+    investigationId,
+    sourceAlertId: 'alert_0052',
+    title: 'Darknet Entity Velocity Spike & Suspicious Outflow Anomaly',
+    status: 'OPEN',
+    priority: 'URGENT',
+    createdAt: '2026-09-05T10:50:00.000Z',
+    assignedTo: 'Analyst R-04',
+    evidenceIds: ['alert_0052', investigationId, clusterId],
   },
   {
     id: 'case_2026_0088',

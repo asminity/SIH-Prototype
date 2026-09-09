@@ -1,4 +1,4 @@
-import type { Alert, AlertId, AlertStatus, Case, CaseId } from '../types/domain'
+import type { Alert, AlertId, AlertStatus, Case, CaseId, CaseStatus } from '../types/domain'
 import { alerts as initialAlerts, cases as initialCases } from '../data/mockData'
 
 type PrototypeState = {
@@ -6,7 +6,7 @@ type PrototypeState = {
   cases: Case[]
 }
 
-const storageKey = 'bitcoin-fi-prototype-state'
+const storageKey = 'blockch-ai-prototype-state-v1'
 
 function cloneState(state: PrototypeState): PrototypeState {
   return { alerts: state.alerts.map((alert) => ({ ...alert, transactionIds: [...alert.transactionIds] })), cases: state.cases.map((item) => ({ ...item, evidenceIds: [...item.evidenceIds] })) }
@@ -55,6 +55,13 @@ export const prototypeStore = {
   },
   getCase(caseId: CaseId) {
     return state.cases.find((item) => item.id === caseId)
+  },
+  updateCaseStatus(caseId: CaseId, status: CaseStatus) {
+    const caseRecord = state.cases.find((item) => item.id === caseId)
+    if (!caseRecord) return undefined
+    caseRecord.status = status
+    persist()
+    return { ...caseRecord, evidenceIds: [...caseRecord.evidenceIds] }
   },
   addCase(caseRecord: Case) {
     const existing = state.cases.find((item) => item.id === caseRecord.id)

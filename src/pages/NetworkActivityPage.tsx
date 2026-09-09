@@ -259,8 +259,7 @@ export function NetworkActivityPage() {
       {/* Page Header with Real-time Stream Control */}
       <PageHeader
         eyebrow="SIGNAL INTELLIGENCE / NETWORK OPERATIONS"
-        title="Network Telemetry & Edge Relays"
-        description="Trace observed P2P propagation, Tor exit relays, and autonomous system correlation across the demonstration cluster."
+        title="Network Activity"
         actions={
           <div className="flex-actions">
             <button

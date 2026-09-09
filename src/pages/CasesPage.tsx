@@ -15,6 +15,9 @@ import {
   ExternalLink,
   ChevronRight,
   Zap,
+  Play,
+  Check,
+  RotateCcw,
 } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
@@ -26,8 +29,8 @@ import {
   getRiskAssessment,
   getTransactions,
   updateAlertStatus,
+  updateCaseStatus,
 } from '../services/mockServices'
-import type { AlertStatus } from '../types/domain'
 import { GraphCanvas } from '../components/graph/GraphCanvas'
 import { PageHeader } from '../components/ui/PageHeader'
 import { SeverityBadge } from '../components/ui/SeverityBadge'
@@ -49,7 +52,7 @@ export function CasesPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [refresh, setRefresh] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'URGENT' | 'IN_REVIEW' | 'CLOSED'>('ALL')
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'OPEN' | 'IN_REVIEW' | 'CLOSED' | 'URGENT'>('ALL')
   const [activeTab, setActiveTab] = useState<'dossier' | 'timeline' | 'models' | 'graph' | 'disposition'>('dossier')
   const [notes, setNotes] = useState('')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
@@ -77,9 +80,10 @@ export function CasesPage() {
 
       if (!matchesSearch) return false
 
-      if (statusFilter === 'URGENT') return c.priority === 'URGENT'
+      if (statusFilter === 'OPEN') return c.status === 'OPEN'
       if (statusFilter === 'IN_REVIEW') return c.status === 'IN_REVIEW'
       if (statusFilter === 'CLOSED') return c.status === 'CLOSED'
+      if (statusFilter === 'URGENT') return c.priority === 'URGENT'
       return true
     })
   }, [cases, searchQuery, statusFilter])
@@ -107,12 +111,37 @@ export function CasesPage() {
   const graph = getGraphData(cluster.id)
   const transactions = getTransactions().filter((tx) => cluster.transactionIds.includes(tx.id))
 
-  const updateDecision = (decision: string) => {
-    const alertStatus: AlertStatus =
-      decision === 'CONFIRMED' ? 'CONFIRMED' : decision === 'FALSE_POSITIVE' ? 'FALSE_POSITIVE' : 'REVIEWING'
-    updateAlertStatus(selectedCase.sourceAlertId, alertStatus)
+  const handleStartReview = () => {
+    updateCaseStatus(selectedCase.id, 'IN_REVIEW')
+    updateAlertStatus(selectedCase.sourceAlertId, 'REVIEWING')
     setRefresh((v) => v + 1)
-    showToast(`Case status updated: ${alertStatus.replace('_', ' ')}`)
+    showToast(`Case ${caseLabel(selectedCase.id)} is now IN REVIEW. Review underway.`)
+  }
+
+  const handleCompleteCase = (verdict: 'CONFIRMED' | 'FALSE_POSITIVE' = 'CONFIRMED') => {
+    updateCaseStatus(selectedCase.id, 'CLOSED')
+    updateAlertStatus(selectedCase.sourceAlertId, verdict)
+    setRefresh((v) => v + 1)
+    showToast(`Case ${caseLabel(selectedCase.id)} completed & marked CLOSED (${verdict.replace('_', ' ')}).`)
+  }
+
+  const handleReopenCase = () => {
+    updateCaseStatus(selectedCase.id, 'OPEN')
+    updateAlertStatus(selectedCase.sourceAlertId, 'REVIEWING')
+    setRefresh((v) => v + 1)
+    showToast(`Case ${caseLabel(selectedCase.id)} re-opened as OPEN.`)
+  }
+
+  const updateDecision = (decision: string) => {
+    if (decision === 'REVIEWING') {
+      handleStartReview()
+    } else if (decision === 'CONFIRMED') {
+      handleCompleteCase('CONFIRMED')
+    } else if (decision === 'FALSE_POSITIVE') {
+      handleCompleteCase('FALSE_POSITIVE')
+    } else if (decision === 'REOPEN') {
+      handleReopenCase()
+    }
   }
 
   const saveNotes = () => {
@@ -230,7 +259,7 @@ export function CasesPage() {
 
             {/* Filter Pills */}
             <div className="case-filter-pills">
-              {(['ALL', 'URGENT', 'IN_REVIEW', 'CLOSED'] as const).map((filter) => (
+              {(['ALL', 'OPEN', 'IN_REVIEW', 'CLOSED', 'URGENT'] as const).map((filter) => (
                 <button
                   key={filter}
                   type="button"
@@ -324,10 +353,45 @@ export function CasesPage() {
                 </div>
                 <small className="case-risk-conf">{Math.round(caseConfidence * 100)}% Confidence</small>
               </div>
-              <StatusBadge
-                label={selectedCase.status.replace('_', ' ')}
-                tone={selectedCase.status === 'CLOSED' ? 'operational' : 'warning'}
-              />
+              <div className="case-banner__actions-col">
+                <StatusBadge
+                  label={selectedCase.status.replace('_', ' ')}
+                  tone={selectedCase.status === 'CLOSED' ? 'operational' : selectedCase.status === 'IN_REVIEW' ? 'warning' : 'neutral'}
+                />
+                {selectedCase.status === 'OPEN' && (
+                  <button
+                    type="button"
+                    className="button button--primary button--sm"
+                    onClick={handleStartReview}
+                    title="Start reviewing this case"
+                  >
+                    <Play size={12} />
+                    <span>START REVIEW</span>
+                  </button>
+                )}
+                {selectedCase.status === 'IN_REVIEW' && (
+                  <button
+                    type="button"
+                    className="button button--primary button--sm"
+                    onClick={() => handleCompleteCase('CONFIRMED')}
+                    title="Complete review and mark case closed"
+                  >
+                    <Check size={12} />
+                    <span>COMPLETE CASE</span>
+                  </button>
+                )}
+                {selectedCase.status === 'CLOSED' && (
+                  <button
+                    type="button"
+                    className="button button--secondary button--sm"
+                    onClick={handleReopenCase}
+                    title="Re-open case for further investigation"
+                  >
+                    <RotateCcw size={12} />
+                    <span>REOPEN CASE</span>
+                  </button>
+                )}
+              </div>
             </div>
           </section>
 
@@ -654,8 +718,22 @@ export function CasesPage() {
                   >
                     <XCircle size={16} />
                     <div>
-                      <strong>Mark False Positive</strong>
+                      <strong>Mark False Positive &amp; Close</strong>
                       <small>Dismiss alert as legitimate exchange activity</small>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`disposition-btn disposition-btn--reopen ${
+                      selectedCase.status === 'OPEN' ? 'disposition-btn--active' : ''
+                    }`}
+                    onClick={() => updateDecision('REOPEN')}
+                  >
+                    <RotateCcw size={16} />
+                    <div>
+                      <strong>Re-open / Fresh Case</strong>
+                      <small>Reset case to OPEN for initial triage assignment</small>
                     </div>
                   </button>
                 </div>

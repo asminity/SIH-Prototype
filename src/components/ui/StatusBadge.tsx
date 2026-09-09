@@ -1,6 +1,6 @@
 type StatusBadgeProps = {
   label: string
-  tone?: 'operational' | 'neutral' | 'warning'
+  tone?: 'operational' | 'neutral' | 'warning' | 'danger'
 }
 
 export function StatusBadge({ label, tone = 'neutral' }: StatusBadgeProps) {
@@ -11,3 +11,4 @@ export function StatusBadge({ label, tone = 'neutral' }: StatusBadgeProps) {
     </span>
   )
 }
+

@@ -16,7 +16,7 @@ export function AppShell() {
         <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="page-container"><Outlet /></main>
         <footer className="app-footer">
-          <span>BITCOIN FI / SECURE ANALYST WORKSPACE</span>
+          <span>BlockCH-ai / SECURE ANALYST WORKSPACE</span>
           <span>BUILD 0.1.0 / DEMONSTRATION</span>
         </footer>
       </div>

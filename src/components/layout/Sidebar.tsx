@@ -1,4 +1,4 @@
-import { Bitcoin, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { navigationSections, routes } from '../../data/navigation'
 
@@ -6,9 +6,11 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
-        <div className="brand-mark" aria-hidden="true"><Bitcoin size={22} strokeWidth={1.8} /></div>
+        <div className="brand-mark brand-mark--img" aria-hidden="true">
+          <img src="/logo.png" alt="BlockCH-ai Logo" className="brand-logo-img" />
+        </div>
         <div>
-          <p className="brand-name">BITCOIN FI</p>
+          <p className="brand-name">BlockCH-ai</p>
           <p className="brand-subtitle">INTELLIGENCE PLATFORM</p>
         </div>
       </div>
