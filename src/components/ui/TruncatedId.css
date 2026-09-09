@@ -1,0 +1,60 @@
+.truncated-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+  background: rgba(100, 199, 204, 0.06);
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: default;
+  vertical-align: middle;
+  max-width: 100%;
+}
+
+.truncated-id--clickable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.truncated-id--clickable:hover {
+  background: rgba(100, 199, 204, 0.14);
+}
+
+.truncated-id__code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--cyan);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.truncated-id__copy-btn {
+  display: grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  color: var(--text-dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.truncated-id--clickable:hover .truncated-id__copy-btn,
+.truncated-id:hover .truncated-id__copy-btn {
+  opacity: 1;
+}
+
+.truncated-id__copy-btn:hover {
+  color: var(--cyan);
+}
+
+.truncated-id__copied {
+  color: var(--green);
+}

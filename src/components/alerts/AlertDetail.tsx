@@ -1,0 +1,21 @@
+import { ArrowUpRight, Check, Clock3, GitBranch, Network, ShieldCheck, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import type { AlertDetailRecord, AlertStatus } from '../../types/domain'
+import { SeverityBadge } from '../ui/SeverityBadge'
+import { SectionCard } from '../ui/SectionCard'
+
+type AlertDetailProps = {
+  detail: AlertDetailRecord
+  onStatusChange: (status: AlertStatus) => void
+}
+
+const shortHash = (value: string) => `${value.slice(0, 7)}...${value.slice(-6)}`
+const formatTime = (timestamp: string) => new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(timestamp))
+
+export function AlertDetail({ detail, onStatusChange }: AlertDetailProps) {
+  const { alert, entity, cluster, investigation } = detail
+  const canReview = alert.status === 'NEW'
+  const canConfirm = alert.status === 'REVIEWING'
+  const canFalsePositive = alert.status === 'NEW' || alert.status === 'REVIEWING'
+  return <SectionCard eyebrow="SELECTED ALERT EVIDENCE" title="Alert detail" className="alert-detail"><div className="alert-detail__header"><div><span className="alert-detail__id">{alert.id.replace('alert_', 'ALERT-')}</span><h2>{alert.title}</h2><p>{alert.description}</p></div><div className="alert-detail__severity"><SeverityBadge severity={alert.severity} /><strong>{alert.riskScore}<small> / 100</small></strong><span>{Math.round(alert.confidence * 100)}% confidence</span></div></div><div className="alert-detail__actions"><span className={`alert-status alert-status--${alert.status.toLowerCase()}`}>{alert.status}</span><button disabled={!canReview} onClick={() => onStatusChange('REVIEWING')} type="button"><Clock3 size={14} />Start review</button><button disabled={!canConfirm} onClick={() => onStatusChange('CONFIRMED')} type="button"><Check size={14} />Confirm</button><button className="alert-action--danger" disabled={!canFalsePositive} onClick={() => onStatusChange('FALSE_POSITIVE')} type="button"><X size={14} />False positive</button></div><div className="alert-detail__grid"><div><h3>Alert context</h3><dl><dt>Entity</dt><dd><Link to={`/entity-explorer?entity=${entity.id}`}>{entity.label}<ArrowUpRight size={12} /></Link></dd><dt>Cluster</dt><dd><Link to={`/entity-graph?cluster=${cluster.id}`}>{cluster.displayId}<GitBranch size={12} /></Link></dd><dt>Investigation</dt><dd><Link to={`/investigations?investigation=${investigation.id}`}>{investigation.title}<ArrowUpRight size={12} /></Link></dd><dt>Generated</dt><dd>{formatTime(alert.generatedAt)}</dd></dl></div><div><h3>Risk summary</h3><div className="alert-detail__risk-summary"><strong>{alert.riskScore} / 100</strong><SeverityBadge severity={alert.severity} /><span>{Math.round(alert.confidence * 100)}% confidence</span></div><p className="alert-detail__caveat">Potential suspicious pattern requiring analyst review; observed evidence does not independently establish criminal activity.</p></div></div><div className="alert-detail__evidence-grid"><div><h3>Related transactions <b>{detail.transactions.length}</b></h3>{detail.transactions.map((transaction) => <Link key={transaction.id} to={`/transactions?tx=${transaction.id}`}>{shortHash(transaction.hash)} <ArrowUpRight size={11} /></Link>)}</div><div><h3>Related wallets <b>{detail.wallets.length}</b></h3>{detail.wallets.slice(0, 8).map((wallet) => <Link key={wallet.id} to={`/entity-explorer?wallet=${wallet.id}`}>{shortHash(wallet.address)} <ArrowUpRight size={11} /></Link>)}</div><div><h3>Related IPs <b>{detail.ips.length}</b></h3>{detail.ips.map((ip) => <Link key={ip.id} to={`/network-activity?ip=${ip.id}`}>{ip.address} <ArrowUpRight size={11} /></Link>)}</div></div><div className="alert-detail__signals"><h3><ShieldCheck size={15} />Contributing signals</h3><ul>{detail.evidence.slice(0, 7).map((evidence) => <li key={evidence}>{evidence}</li>)}</ul></div><div className="alert-detail__timeline"><h3><Network size={15} />Investigation timeline</h3>{detail.timeline.slice(-7).reverse().map((event) => <div key={event.id}><span>{formatTime(event.timestamp)}</span><div><strong>{event.title}</strong><p>{event.description}</p></div></div>)}</div></SectionCard>
+}

@@ -1,0 +1,6 @@
+@media (max-width: 768px) {
+  .investigation-drawer {
+    width: 100vw;
+    max-width: 100vw;
+  }
+}
